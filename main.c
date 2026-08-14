@@ -1,5 +1,12 @@
 #include <stdio.h>
+#include <string.h>
+
 #define MAX_PESSOAS 5
+#define MAX_CARACTERES_NOME 25
+
+//CABEÇALHOS DAS FUNÇÕES
+int buscarPessoaPorNome(char nomeParaBuscar[], char nomes[MAX_PESSOAS][MAX_CARACTERES_NOME]);
+
 
 int menu(){
     int opcao;
@@ -23,6 +30,16 @@ int menu(){
     }
 
     return opcao;
+}
+int buscarPeloNome(char nomeParaBuscar[], char nomes[MAX_PESSOAS][MAX_CARACTERES_NOME]){
+    for(int i = 0; i<MAX_PESSOAS; i++){
+        if(strcmp(nomeParaBuscar, nomes[i]) == 0)
+            printf("NOME: %s - ENCONTRADO COM SUCESSO!", nomeParaBuscar);
+            return i;
+    }    
+    
+    printf("NOME: %s -  NÃO ENCONTRADO!", nomeParaBuscar);
+    return -1;
 }
 
 void cadastroPessoas(char nome[MAX_PESSOAS][50], float notas[MAX_PESSOAS][6], char categ[6][20]){
@@ -145,7 +162,10 @@ int main()
                 exibirPessoas(nome, notas, categ);
                 break;
             case 3:
-                // Função buscar pessoa pelo nome
+                char nomeProcurado[MAX_CARACTERES_NOME];
+                printf("\nDIGITE O NOME QUE DESEJA BUSCAR: ");
+                scanf("%[^\n]", nomeProcurado);
+                printf("\n %d", buscarPeloNome(nomeProcurado, nome[MAX_PESSOAS][MAX_CARACTERES_NOME];);
                 break;
             case 4:
                 // Função comparar duas pessoas
