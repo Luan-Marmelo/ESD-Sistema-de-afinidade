@@ -101,7 +101,6 @@ int menu(){
 
     return opcao;
 }
-
 int buscarPeloNome(char nomes[MAX_PESSOAS][MAX_CARACTERES_NOME]){
     char nomeProcurado[MAX_CARACTERES_NOME];
     printf("\nDIGITE O NOME QUE DESEJA BUSCAR: ");
