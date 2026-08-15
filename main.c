@@ -1,12 +1,74 @@
+/* 
+v1 
+Daniel Chipolesk 
+Frederico Ferreira
+Luan Marmelo
+*/
 #include <stdio.h>
 #include <string.h>
+#include <strings.h>
 
+//CONSTANTES
 #define MAX_PESSOAS 5
 #define MAX_CARACTERES_NOME 25
+#define QTD_PREF 6
 
 //CABEÇALHOS DAS FUNÇÕES
-int buscarPessoaPorNome(char nomeParaBuscar[], char nomes[MAX_PESSOAS][MAX_CARACTERES_NOME]);
+int menu();
+int buscarPeloNome(char nomes[MAX_PESSOAS][MAX_CARACTERES_NOME]);
+void cadastroPessoas(char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], float notas[MAX_PESSOAS][QTD_PREF], char categ[QTD_PREF][20]);
+void exibirPessoas(char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], float notas[MAX_PESSOAS][QTD_PREF], char categ[QTD_PREF][20]);
+void analiseDetalPref(char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], float notas[MAX_PESSOAS][QTD_PREF], char categ[QTD_PREF][20]);
 
+
+
+int main()
+{
+    char categ[QTD_PREF][20] = {"Musica", "Cinema", "Jogos", "Esportes", "Leitura", "Programacao"};
+    char nome[MAX_PESSOAS][MAX_CARACTERES_NOME] = {"Ana", "Bruno", "Carla", "Diego", "Eduardo"};
+    float notas[MAX_PESSOAS][QTD_PREF] = {
+        {8.5, 7.0, 9.0, 6.5, 8.0, 7.5},
+        {6.0, 8.5, 7.0, 9.0, 6.5, 8.0},
+        {9.0, 6.5, 8.0, 7.5, 8.5, 7.0},
+        {7.5, 8.0, 6.5, 9.0, 7.0, 8.5},
+        {8.0, 7.5, 9.0, 6.5, 8.5, 7.0}
+    };
+    int opcaoMenu;
+
+    do{
+        opcaoMenu = menu();
+        switch(opcaoMenu){
+            case 1:
+                cadastroPessoas(nome, notas, categ);
+                break;
+            case 2:
+                exibirPessoas(nome, notas, categ);
+                break;
+            case 3:
+                printf("\n %d\n", buscarPeloNome(nome));
+                break;
+            case 4:
+                // Função comparar duas pessoas
+                break;
+            case 5:
+                // Função encontrar pessoa mais semelhante
+                break;
+            case 6:
+                // Função exibir ranking de afinidade
+                break;
+            case 7:
+                analiseDetalPref(nome, notas, categ);
+                break;
+            case 0:
+                printf("Encerrando o programa...\n");
+                break;
+        }
+    } while(opcaoMenu != 0);
+    
+    
+
+    return 0;
+}
 
 int menu(){
     int opcao;
@@ -31,18 +93,24 @@ int menu(){
 
     return opcao;
 }
-int buscarPeloNome(char nomeParaBuscar[], char nomes[MAX_PESSOAS][MAX_CARACTERES_NOME]){
+
+int buscarPeloNome(char nomes[MAX_PESSOAS][MAX_CARACTERES_NOME]){
+    char nomeProcurado[MAX_CARACTERES_NOME];
+    printf("\nDIGITE O NOME QUE DESEJA BUSCAR: ");
+    scanf(" %s", nomeProcurado);
+    
     for(int i = 0; i<MAX_PESSOAS; i++){
-        if(strcmp(nomeParaBuscar, nomes[i]) == 0)
-            printf("NOME: %s - ENCONTRADO COM SUCESSO!", nomeParaBuscar);
+        if(strcasecmp(nomeProcurado, nomes[i]) == 0){
+            printf("\nNOME: %s - ENCONTRADO COM SUCESSO!\n", nomeProcurado);
             return i;
+        }
     }    
     
-    printf("NOME: %s -  NÃO ENCONTRADO!", nomeParaBuscar);
+    printf("\nNOME: %s -  NÃO ENCONTRADO!\n", nomeProcurado);
     return -1;
 }
 
-void cadastroPessoas(char nome[MAX_PESSOAS][50], float notas[MAX_PESSOAS][6], char categ[6][20]){
+void cadastroPessoas(char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], float notas[MAX_PESSOAS][QTD_PREF], char categ[QTD_PREF][20]){
     int i, j;
     for (i=0; i< MAX_PESSOAS; i++){
         printf("Digite o nome da pessoa %d: \n", i+1);
@@ -61,7 +129,7 @@ void cadastroPessoas(char nome[MAX_PESSOAS][50], float notas[MAX_PESSOAS][6], ch
     getchar();
 }
 
-void exibirPessoas(char nome[MAX_PESSOAS][50], float notas[MAX_PESSOAS][6], char categ[6][20]){
+void exibirPessoas(char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], float notas[MAX_PESSOAS][QTD_PREF], char categ[QTD_PREF][20]){
     int i, j;
     printf("===================================================================\n");
     printf("%-12s %6.3s %6.3s %6.3s %6.3s %6.3s %6.3s\n", "NOME", categ[0], categ[1], categ[2], categ[3], categ[4], categ[5]);
@@ -79,7 +147,7 @@ void exibirPessoas(char nome[MAX_PESSOAS][50], float notas[MAX_PESSOAS][6], char
     getchar();
 }
 
-void analiseDetalPref(char nome[MAX_PESSOAS][50], float notas[MAX_PESSOAS][6], char categ[6][20]){
+void analiseDetalPref(char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], float notas[MAX_PESSOAS][QTD_PREF], char categ[QTD_PREF][20]){
     int i, j, p1, p2;
     float vDiferenca[6];
 
@@ -139,53 +207,4 @@ void analiseDetalPref(char nome[MAX_PESSOAS][50], float notas[MAX_PESSOAS][6], c
 
 
 
-int main()
-{
-    char categ[6][20] = {"Musica", "Cinema", "Jogos", "Esportes", "Leitura", "Programacao"};
-    char nome[MAX_PESSOAS][MAX_CARACTERES_NOME] = {"Ana", "Bruno", "Carla", "Diego", "Eduardo"};
-    float notas[MAX_PESSOAS][6] = {
-        {8.5, 7.0, 9.0, 6.5, 8.0, 7.5},
-        {6.0, 8.5, 7.0, 9.0, 6.5, 8.0},
-        {9.0, 6.5, 8.0, 7.5, 8.5, 7.0},
-        {7.5, 8.0, 6.5, 9.0, 7.0, 8.5},
-        {8.0, 7.5, 9.0, 6.5, 8.5, 7.0}
-    };
-    int opcaoMenu;
-
-    do{
-        opcaoMenu = menu();
-        switch(opcaoMenu){
-            case 1:
-                cadastroPessoas(nome, notas, categ);
-                break;
-            case 2:
-                exibirPessoas(nome, notas, categ);
-                break;
-            case 3:
-                char nomeProcurado[MAX_CARACTERES_NOME];
-                printf("\nDIGITE O NOME QUE DESEJA BUSCAR: ");
-                scanf("%[^\n]", nomeProcurado);
-                printf("\n %d", buscarPeloNome(nomeProcurado, nome[MAX_CARACTERES_NOME]);
-                break;
-            case 4:
-                // Função comparar duas pessoas
-                break;
-            case 5:
-                // Função encontrar pessoa mais semelhante
-                break;
-            case 6:
-                // Função exibir ranking de afinidade
-                break;
-            case 7:
-                analiseDetalPref(nome, notas, categ);
-                break;
-            case 0:
-                printf("Encerrando o programa...\n");
-                break;
-        }
-    } while(opcaoMenu != 0);
     
-    
-
-    return 0;
-}    
