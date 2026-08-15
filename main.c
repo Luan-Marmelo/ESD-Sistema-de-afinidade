@@ -142,7 +142,7 @@ void analiseDetalPref(char nome[MAX_PESSOAS][50], float notas[MAX_PESSOAS][6], c
 int main()
 {
     char categ[6][20] = {"Musica", "Cinema", "Jogos", "Esportes", "Leitura", "Programacao"};
-    char nome[MAX_PESSOAS][50] = {"Ana", "Bruno", "Carla", "Diego", "Eduardo"};
+    char nome[MAX_PESSOAS][MAX_CARACTERES_NOME] = {"Ana", "Bruno", "Carla", "Diego", "Eduardo"};
     float notas[MAX_PESSOAS][6] = {
         {8.5, 7.0, 9.0, 6.5, 8.0, 7.5},
         {6.0, 8.5, 7.0, 9.0, 6.5, 8.0},
@@ -165,7 +165,7 @@ int main()
                 char nomeProcurado[MAX_CARACTERES_NOME];
                 printf("\nDIGITE O NOME QUE DESEJA BUSCAR: ");
                 scanf("%[^\n]", nomeProcurado);
-                printf("\n %d", buscarPeloNome(nomeProcurado, nome[MAX_PESSOAS][MAX_CARACTERES_NOME];);
+                printf("\n %d", buscarPeloNome(nomeProcurado, nome[MAX_CARACTERES_NOME]);
                 break;
             case 4:
                 // Função comparar duas pessoas
