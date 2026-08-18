@@ -17,15 +17,16 @@ Luan Marmelo
 
 //CABEÇALHOS DAS FUNÇÕES
 int menu();
-int buscarPeloNome(char nomes[MAX_PESSOAS][MAX_CARACTERES_NOME]);
-void cadastroPessoas(char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], float notas[MAX_PESSOAS][QTD_PREF], char categ[QTD_PREF][20]);
-void exibirPessoas(char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], float notas[MAX_PESSOAS][QTD_PREF], char categ[QTD_PREF][20]);
-void analiseDetalPref(char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], float notas[MAX_PESSOAS][QTD_PREF], char categ[QTD_PREF][20]);
+float validaNota();
+int buscarPeloNome(int cadastrado, char nomes[MAX_PESSOAS][MAX_CARACTERES_NOME]);
+int cadastroPessoas(char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], float notas[MAX_PESSOAS][QTD_PREF], char categ[QTD_PREF][20]);
+void exibirPessoas(int cadastrado, char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], float notas[MAX_PESSOAS][QTD_PREF], char categ[QTD_PREF][20]);
+void analiseDetalPref(int cadastrado, char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], float notas[MAX_PESSOAS][QTD_PREF], char categ[QTD_PREF][20]);
 
 float distanciaEuclidianaAB(int pessoaA, int pessoaB, float notas[MAX_PESSOAS][QTD_PREF]);
-void comparaDuasPessoas(char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], float notas[MAX_PESSOAS][QTD_PREF]);
-void calcularMatrizDistancias(char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], float notas[MAX_PESSOAS][QTD_PREF], float matrizDistancias[MAX_PESSOAS][MAX_PESSOAS]);
-void acharMaisSemelhantes(char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], float notas[MAX_PESSOAS][QTD_PREF], float matrizDistancias[MAX_PESSOAS][MAX_PESSOAS]);
+void comparaDuasPessoas(int cadastrado, char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], float notas[MAX_PESSOAS][QTD_PREF]);
+void calcularMatrizDistancias(int cadastrado, char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], float notas[MAX_PESSOAS][QTD_PREF], float matrizDistancias[MAX_PESSOAS][MAX_PESSOAS]);
+void acharMaisSemelhantes(int cadastrado, char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], float notas[MAX_PESSOAS][QTD_PREF], float matrizDistancias[MAX_PESSOAS][MAX_PESSOAS]);
 
 int main()
 {
@@ -44,30 +45,31 @@ int main()
     float matrizDistancias[MAX_PESSOAS][MAX_PESSOAS];
 
     int opcaoMenu;
+    int cadastrado = MAX_PESSOAS; // Inicialmente, todas as pessoas estão cadastradas
 
     do{
         opcaoMenu = menu();
         switch(opcaoMenu){
             case 1:
-                cadastroPessoas(nome, notas, categ);
+                cadastrado = cadastroPessoas(nome, notas, categ);
                 break;
             case 2:
-                exibirPessoas(nome, notas, categ);
+                exibirPessoas(cadastrado, nome, notas, categ);
                 break;
             case 3:
-                printf("\n %d\n", buscarPeloNome(nome));
+                printf("\n %d\n", buscarPeloNome(cadastrado, nome));
                 break;
             case 4:
-                comparaDuasPessoas(nome, notas);
+                comparaDuasPessoas(cadastrado, nome, notas);
                 break;
             case 5:
-                acharMaisSemelhantes(nome, notas, matrizDistancias);
+                acharMaisSemelhantes(cadastrado, nome, notas, matrizDistancias);
                 break;
             case 6:
                 // Função exibir ranking de afinidade
                 break;
             case 7:
-                analiseDetalPref(nome, notas, categ);
+                analiseDetalPref(cadastrado, nome, notas, categ);
                 break;
             case 0:
                 printf("Encerrando o programa...\n");
@@ -101,12 +103,12 @@ int menu(){
 
     return opcao;
 }
-int buscarPeloNome(char nomes[MAX_PESSOAS][MAX_CARACTERES_NOME]){
+int buscarPeloNome(int cadastrado, char nomes[MAX_PESSOAS][MAX_CARACTERES_NOME]){
     char nomeProcurado[MAX_CARACTERES_NOME];
     printf("\nDIGITE O NOME QUE DESEJA BUSCAR: ");
     scanf(" %s", nomeProcurado);
     
-    for(int i = 0; i<MAX_PESSOAS; i++){
+    for(int i = 0; i < cadastrado; i++){
         if(strcasecmp(nomeProcurado, nomes[i]) == 0){
             printf("\nNOME: %s - ENCONTRADO COM SUCESSO!\n", nomeProcurado);
             return i;
@@ -117,31 +119,53 @@ int buscarPeloNome(char nomes[MAX_PESSOAS][MAX_CARACTERES_NOME]){
     return -1;
 }
 
-void cadastroPessoas(char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], float notas[MAX_PESSOAS][QTD_PREF], char categ[QTD_PREF][20]){
-    int i, j;
-    for (i=0; i< MAX_PESSOAS; i++){
+float validaNota(){
+    float nota;
+    scanf(" %f", &nota);
+
+    while(nota < 0 || nota > 10){
+        printf("Nota inválida. A nota precisa estar entre 0 e 10. Digite novamente: \n");
+        scanf(" %f", &nota);
+    }
+
+    return nota;
+
+}
+
+int cadastroPessoas(char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], float notas[MAX_PESSOAS][QTD_PREF], char categ[QTD_PREF][20]){
+    int i, j, qtdCadastro;
+
+    printf("Quantas pessoas deseja cadastrar? \n");
+    scanf(" %d", &qtdCadastro);
+
+    while(qtdCadastro < 1 || qtdCadastro > MAX_PESSOAS){
+        printf("Quantidade inválida. A quantidade precisa estar entre 1 e %d. Digite novamente: \n", MAX_PESSOAS);
+        scanf(" %d", &qtdCadastro);
+    }
+
+
+    for (i=0; i< qtdCadastro; i++){
         printf("Digite o nome da pessoa %d: \n", i+1);
         scanf(" %s", nome[i]);
-        for (j=0; j<6; j++){
-            printf("Digite a nota para %s; \n", categ[j] );
-            scanf(" %f", &notas[i][j]);
-            if(notas[i][j] < 0 || notas[i][j] > 10){
-                printf("Nota inválida. Digite novamente: \n");
-                j--;
-            }
+        for (j=0; j<QTD_PREF; j++){
+            printf("Digite a nota para %s: \n", categ[j] );
+            notas[i][j] = validaNota();
         }
     }
+
     printf("Pressione ENTER para retornar ao menu.\n");
     while(getchar() != '\n');
     getchar();
+
+    return qtdCadastro;
 }
 
-void exibirPessoas(char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], float notas[MAX_PESSOAS][QTD_PREF], char categ[QTD_PREF][20]){
+void exibirPessoas(int cadastrado, char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], float notas[MAX_PESSOAS][QTD_PREF], char categ[QTD_PREF][20]){
     int i, j;
     printf("===================================================================\n");
     printf("%-12s %6.3s %6.3s %6.3s %6.3s %6.3s %6.3s\n", "NOME", categ[0], categ[1], categ[2], categ[3], categ[4], categ[5]);
     printf("===================================================================\n");
-    for(i=0; i<MAX_PESSOAS; i++){
+    for(i=0; i<(cadastrado) ; i++){
         printf("%-15s ", nome[i]);
         for(j=0; j<6; j++){
             printf("%-6.1f ", notas[i][j]);
@@ -165,14 +189,14 @@ float distanciaEuclidianaAB(int pessoaA, int pessoaB, float notas[MAX_PESSOAS][Q
    return sqrt(somaAB);
 }
 
-void comparaDuasPessoas(char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], float notas[MAX_PESSOAS][QTD_PREF]){
+void comparaDuasPessoas(int cadastrado, char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], float notas[MAX_PESSOAS][QTD_PREF]){
     
     int pessoaA;
     int pessoaB;
     float distanciaAB;
     
-    pessoaA = buscarPeloNome(nome);
-    pessoaB = buscarPeloNome(nome);
+    pessoaA = buscarPeloNome(cadastrado, nome);
+    pessoaB = buscarPeloNome(cadastrado, nome);
     
     distanciaAB = distanciaEuclidianaAB(pessoaA, pessoaB, notas);
     
@@ -183,13 +207,14 @@ void comparaDuasPessoas(char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], float notas
 }
 
 void calcularMatrizDistancias(
+                    int cadastrado,
                     char nome[MAX_PESSOAS][MAX_CARACTERES_NOME],
                     float notas[MAX_PESSOAS][QTD_PREF],
                     float matrizDistancias[MAX_PESSOAS][MAX_PESSOAS]) {
 
-    for (int i = 0; i < MAX_PESSOAS; i++)
+    for (int i = 0; i < cadastrado; i++)
     {
-        for (int j = 0; j < MAX_PESSOAS; j++)
+        for (int j = 0; j < cadastrado; j++)
         {
             matrizDistancias[i][j] = distanciaEuclidianaAB(i, j, notas);
         }
@@ -199,18 +224,18 @@ void calcularMatrizDistancias(
     
     printf("%-12s", "");
     
-    for (int j = 0; j < MAX_PESSOAS; j++)
+    for (int j = 0; j < cadastrado; j++)
     {
         printf("%12s", nome[j]);
     }
     
     printf("\n");
     
-    for (int i = 0; i < MAX_PESSOAS; i++)
+    for (int i = 0; i < cadastrado; i++)
     {
         printf("%-12s", nome[i]);
         
-        for (int j = 0; j < MAX_PESSOAS; j++)
+        for (int j = 0; j < cadastrado; j++)
         {
             printf("%12.2f", matrizDistancias[i][j]);
         }
@@ -220,18 +245,19 @@ void calcularMatrizDistancias(
 }
 
 void acharMaisSemelhantes(
+        int cadastrado,
         char nome[MAX_PESSOAS][MAX_CARACTERES_NOME],
         float notas[MAX_PESSOAS][QTD_PREF],
         float matrizDistancias[MAX_PESSOAS][MAX_PESSOAS])
 {
-    calcularMatrizDistancias(nome, notas, matrizDistancias);
+    calcularMatrizDistancias(cadastrado, nome, notas, matrizDistancias);
     
     float menorDistancia = FLT_MAX;
     
     int pessoaA = 0;
     int pessoaB = 0;
     
-    for (int i = 0; i < MAX_PESSOAS; i++)
+    for (int i = 0; i < cadastrado; i++)
     {
         for (int j = 0; j < i; j++)
         {
@@ -250,52 +276,61 @@ void acharMaisSemelhantes(
     printf("\nDistãncia: %.2f\n\n", menorDistancia);
 }
 
-void analiseDetalPref(char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], float notas[MAX_PESSOAS][QTD_PREF], char categ[QTD_PREF][20]){
+void analiseDetalPref(int cadastrado, char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], float notas[MAX_PESSOAS][QTD_PREF], char categ[QTD_PREF][20]){
     int i, j, p1, p2;
-    float vDiferenca[6];
+    float vDiferenca[QTD_PREF];
+
+    if (cadastrado < 2) {
+        printf("Necessário cadastrar pelo menos duas pessoas para analisar preferências.\n");
+        return;
+    }
 
     printf("===================================================================\n");
     printf("ANALISE DETALHADA DE PREFERÊNCIAS\n");
     printf("===================================================================\n");
     printf("\n");
-    printf("Digite o número das duas pessoas que deseja analisar (1 a 5): \n");
-    scanf("%d %d", &p1, &p2);
+    p1 = buscarPeloNome(cadastrado, nome);
+    p2 = buscarPeloNome(cadastrado, nome);
+    if (p1 == p2) {
+        printf("Erro ao buscar pessoas.\n");
+        return;
+    }
 
     printf("===================================================================\n");
-    printf("Analise detalhada de preferências entre %s e %s\n", nome[p1-1], nome[p2-1]);
+    printf("Analise detalhada de preferências entre %s e %s\n", nome[p1], nome[p2]);
     printf("===================================================================\n");
     printf("\n");
-    printf("%-12s %-12s %-12s %-12s\n", "Preferencia", nome[p1-1], nome[p2-1], "Diferença");
+    printf("%-12s %-12s %-12s %-12s\n", "Preferencia", nome[p1], nome[p2], "Diferença");
     printf("-------------------------------------------------------------------\n");
 
-    for(i=0; i<6; i++){
-        if(notas[p1-1][i] - notas[p2-1][i] < 0){
-            vDiferenca[i] = (notas[p1-1][i] - notas[p2-1][i]) * -1;
+    for(i=0; i<QTD_PREF; i++){
+        if(notas[p1][i] - notas[p2][i] < 0){
+            vDiferenca[i] = (notas[p1][i] - notas[p2][i]) * -1;
         } else {
-            vDiferenca[i] = notas[p1-1][i] - notas[p2-1][i];
+            vDiferenca[i] = notas[p1][i] - notas[p2][i];
         }
         
 
-        printf("%-12s %-12.1f %-12.1f %-12.1f\n", categ[i], notas[p1-1][i], notas[p2-1][i], vDiferenca[i]);
+        printf("%-12s %-12.1f %-12.1f %-12.1f\n", categ[i], notas[p1][i], notas[p2][i], vDiferenca[i]);
     }
 
     printf("--------------------------------------------------------------------\n");
     printf("\n");
-    //Necessita-se implementar a função distanciaEuclidiana para calcular a distância entre as duas pessoas
-    //printf("Distancia euclidiana entre %s e %s: %.2f\n", nome[p1-1], nome[p2-1], distanciaEuclidiana(notas, p1-1, p2-1));
+    
+    printf("Distancia euclidiana entre %s e %s: %.2f\n", nome[p1], nome[p2], distanciaEuclidianaAB(p1, p2, notas));
 
     printf("Preferencias mais semelhantes:\n");
 
     
     float valorMaisSemelhante = vDiferenca[0];
 
-    for(i=0; i<6; i++){
+    for(i=0; i<QTD_PREF; i++){
         if(vDiferenca[i] < valorMaisSemelhante){
             valorMaisSemelhante = vDiferenca[i];
         } 
     };
 
-    for(i=0; i<6; i++){
+    for(i=0; i<QTD_PREF; i++){
         if(vDiferenca[i] == valorMaisSemelhante){
             printf("%s\n", categ[i]);
         }
