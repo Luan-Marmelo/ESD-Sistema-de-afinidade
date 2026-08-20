@@ -17,23 +17,37 @@ Luan Marmelo
 
 //CABEÇALHOS DAS FUNÇÕES
 int menu();
+
 float validaNota();
+
 int buscarPeloNome(int cadastrado, char nomes[MAX_PESSOAS][MAX_CARACTERES_NOME]);
+
 int cadastroPessoas(char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], float notas[MAX_PESSOAS][QTD_PREF], char categ[QTD_PREF][20]);
+
 void exibirPessoas(int cadastrado, char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], float notas[MAX_PESSOAS][QTD_PREF], char categ[QTD_PREF][20]);
+
 void analiseDetalPref(int cadastrado, char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], float notas[MAX_PESSOAS][QTD_PREF], char categ[QTD_PREF][20]);
 
 float distanciaEuclidianaAB(int pessoaA, int pessoaB, float notas[MAX_PESSOAS][QTD_PREF]);
+
 void comparaDuasPessoas(int cadastrado, char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], float notas[MAX_PESSOAS][QTD_PREF]);
-void calcularMatrizDistancias(int cadastrado, char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], float notas[MAX_PESSOAS][QTD_PREF], float matrizDistancias[MAX_PESSOAS][MAX_PESSOAS]);
-void acharMaisSemelhantes(int cadastrado, char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], float notas[MAX_PESSOAS][QTD_PREF], float matrizDistancias[MAX_PESSOAS][MAX_PESSOAS]);
+
+void calcularMatrizDistancias(int cadastrado, char nome[MAX_PESSOAS][MAX_CARACTERES_NOME],
+float notas[MAX_PESSOAS][QTD_PREF], float matrizDistancias[MAX_PESSOAS][MAX_PESSOAS]);
+
+float acharMaisSemelhante(int cadastrado, char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], 
+float notas[MAX_PESSOAS][QTD_PREF], float matrizDistancias[MAX_PESSOAS][MAX_PESSOAS]);
+
+void exibirRankingAfinidade(int cadastrado, char nome[MAX_PESSOAS][MAX_CARACTERES_NOME],
+float auxDistancias[MAX_PESSOAS], int auxIndices[MAX_PESSOAS], float notas[MAX_PESSOAS][QTD_PREF]);
 
 int main()
 {
     char categ[QTD_PREF][20] = {"Musica", "Cinema", "Jogos", "Esportes", "Leitura", "Programacao"};
 
     char nome[MAX_PESSOAS][MAX_CARACTERES_NOME] = {"Ana", "Bruno", "Carla", "Diego", "Eduardo"};
-
+    float auxDistancias[MAX_PESSOAS];
+    int auxIndices[MAX_PESSOAS];
     float notas[MAX_PESSOAS][QTD_PREF] = {
         {8.5, 7.0, 9.0, 6.5, 8.0, 7.5},
         {6.0, 8.5, 7.0, 9.0, 6.5, 8.0},
@@ -44,7 +58,7 @@ int main()
 
     float matrizDistancias[MAX_PESSOAS][MAX_PESSOAS];
 
-    int opcaoMenu;
+    int opcaoMenu, temp;
     int cadastrado = MAX_PESSOAS; // Inicialmente, todas as pessoas estão cadastradas
 
     do{
@@ -57,16 +71,16 @@ int main()
                 exibirPessoas(cadastrado, nome, notas, categ);
                 break;
             case 3:
-                printf("\n %d\n", buscarPeloNome(cadastrado, nome));
+                temp = buscarPeloNome(cadastrado, nome);
                 break;
             case 4:
                 comparaDuasPessoas(cadastrado, nome, notas);
                 break;
             case 5:
-                acharMaisSemelhantes(cadastrado, nome, notas, matrizDistancias);
+                acharMaisSemelhante(cadastrado, nome, notas, matrizDistancias);
                 break;
             case 6:
-                // Função exibir ranking de afinidade
+                exibirRankingAfinidade(cadastrado, nome, auxDistancias, auxIndices, notas);
                 break;
             case 7:
                 analiseDetalPref(cadastrado, nome, notas, categ);
@@ -236,15 +250,16 @@ void calcularMatrizDistancias(
         printf("%-12s", nome[i]);
         
         for (int j = 0; j < cadastrado; j++)
-        {
+        {  
             printf("%12.2f", matrizDistancias[i][j]);
+
         }
         
         printf("\n"); 
     }
 }
-
-void acharMaisSemelhantes(
+//*/* alteração para adaptar ao que foi pedido no enunciado
+float acharMaisSemelhante(
         int cadastrado,
         char nome[MAX_PESSOAS][MAX_CARACTERES_NOME],
         float notas[MAX_PESSOAS][QTD_PREF],
@@ -253,27 +268,34 @@ void acharMaisSemelhantes(
     calcularMatrizDistancias(cadastrado, nome, notas, matrizDistancias);
     
     float menorDistancia = FLT_MAX;
+    int aux = 0, indiceNome, pessoaOrigem, temp = buscarPeloNome(cadastrado, nome);
     
-    int pessoaA = 0;
-    int pessoaB = 0;
+    while(temp < 0){
+         temp = buscarPeloNome(cadastrado, nome);
+    }
+    pessoaOrigem = temp;
+   
+    int pessoaMaisProxima = 0;
     
-    for (int i = 0; i < cadastrado; i++)
-    {
-        for (int j = 0; j < i; j++)
-        {
-            if (menorDistancia >= matrizDistancias[i][j])
-            {
-                menorDistancia = matrizDistancias[i][j];
-                
-                pessoaA = i;
-                pessoaB = j;
-            }
+    for(int i = 0; i<cadastrado;i++){
+        
+        if(strcasecmp(nome[pessoaOrigem], nome[i]) != 0){
+           aux = distanciaEuclidianaAB(pessoaOrigem, i, notas);
+           
+           if(aux < menorDistancia){
+               menorDistancia=aux;
+               pessoaMaisProxima = i;
+           }
         }
     }
     
-    printf("\n\nPESSOAS MAIS SEMELHANTES SÃO:\n");
-    printf("%s e %s", nome[pessoaA], nome[pessoaB]);
+    printf("\n\nPESSOA MAIS SEMELHANTES COM %s É: %s\n", nome[pessoaOrigem], nome[pessoaMaisProxima]);
     printf("\nDistãncia: %.2f\n\n", menorDistancia);
+    printf("Pressione ENTER para retornar ao menu.\n");
+    while(getchar() != '\n');
+    getchar();
+
+    return menorDistancia;
 }
 
 void analiseDetalPref(int cadastrado, char nome[MAX_PESSOAS][MAX_CARACTERES_NOME], float notas[MAX_PESSOAS][QTD_PREF], char categ[QTD_PREF][20]){
@@ -340,6 +362,47 @@ void analiseDetalPref(int cadastrado, char nome[MAX_PESSOAS][MAX_CARACTERES_NOME
     getchar();
 
 }
+//FALTA TERMINAR
+void exibirRankingAfinidade(int cadastrado, char nome[MAX_PESSOAS][MAX_CARACTERES_NOME],
+float auxDistancias[MAX_PESSOAS], int auxIndices[MAX_PESSOAS], float notas[MAX_PESSOAS][QTD_PREF]){
+      
+    float menorDistancia = FLT_MAX;
+    int aux = 0, indiceNome, pessoaOrigem, temp = buscarPeloNome(cadastrado, nome);
+    
+    while(temp < 0){
+         temp = buscarPeloNome(cadastrado, nome);
+    }
+    pessoaOrigem = temp;
+   
+
+    for(int i = 0, j = 0; i<cadastrado;i++){
+        
+        if(strcasecmp(nome[pessoaOrigem], nome[i]) != 0){
+           aux = distanciaEuclidianaAB(pessoaOrigem, i, notas);
+           
+           if(aux < menorDistancia){
+               menorDistancia=aux;
+               auxIndices[j] = i;
+               auxDistancias[j] = menorDistancia;
+               j++;
+           }
+           if(menorDistancia > auxDistancias[j]){
+                auxDistancias[j+1] = menorDistancia;
+                auxIndices[j+1] = i;
+                j++;
+           }
+        }
+    }
+    printf("========================================\nPERFIS MAIS PROXIMOS DE %s\n========================================\n", nome[pessoaOrigem]);
+    for(int i = 0; i<cadastrado;i++){
+        printf(" %d - %s --------- %2.f\n", i+1 ,nome[auxIndices[i]], auxDistancias[i]);
+    }
+    
+    printf("Pressione ENTER para retornar ao menu.\n");
+    while(getchar() != '\n');
+    getchar();
+}
+
 
 
 
