@@ -1,2 +1,3 @@
 sistema
 *.dSYM/
+.DS_Store
